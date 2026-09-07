@@ -1,0 +1,133 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ArticleExplorer from '../components/ArticleExplorer';
+import Icon from '../components/Icon';
+import { getCategories, listArticles } from '../lib/repository';
+import type { Category, ArticlePage } from '../lib/types';
+import { readMinutes } from '../lib/types';
+let categories: Category[] = [];
+let result: ArticlePage = { articles: [], nextPage: null, total: 0 };
+let failed = false;
+const query = Astro.url.searchParams.get('q') || '';
+const sort =
+  Astro.url.searchParams.get('sort') === 'liked' ? 'liked' : 'newest';
+const category = Astro.url.searchParams.get('category') || '';
+const page = Number(Astro.url.searchParams.get('page')) || 1;
+try {
+  [categories, result] = await Promise.all([
+    getCategories(),
+    listArticles({ q: query, sort, category, page }),
+  ]);
+} catch {
+  failed = true;
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '60');
+}
+const featured = !query && !category && page === 1 ? result.articles[0] : null;
+---
+
+<Layout>
+  <div class="container">
+    <section class="journal-intro">
+      <div>
+        <span class="eyebrow">FOR THE ENDLESSLY CURIOUS</span><h1>
+          Stay curious.<br />Go a little <em>deeper.</em>
+        </h1>
+      </div><div class="intro-aside">
+        <p>
+          Fresh perspectives. Unexpected discoveries.<br class="desktop-only" /> The
+          everyday, made a little more interesting.
+        </p><a class="text-link" href="#articles"
+          >Find your next read <Icon name="arrow" size={19} /></a>
+      </div>
+    </section>
+    <nav class="category-nav" aria-label="Browse primary categories">
+      <a href="/#articles" class={!category ? 'active' : ''}>All stories</a>{
+        categories
+          .filter((c) => c.type === 'primary')
+          .map((c) => <a href={`/category/${c.slug}`}>{c.name}</a>)
+      }
+    </nav>
+    {
+      featured && (
+        <section class="featured-story" aria-labelledby="featured-heading">
+          <>
+            <a
+              class="featured-image"
+              href={`/articles/${featured.slug}`}
+              tabindex="-1"
+              aria-hidden="true"
+            >
+              <>
+                <img
+                  class="editorial-image"
+                  src={featured.headerImage.url}
+                  alt=""
+                  width="1200"
+                  height="800"
+                  fetchpriority="high"
+                />
+                <span class="image-badge">THE EDITOR’S PICK</span>
+              </>
+            </a>
+            <div class="featured-copy">
+              <>
+                <div class="story-meta">
+                  <>
+                    <a href={`/category/${featured.primaryCategory?.slug}`}>
+                      {featured.primaryCategory?.name}
+                    </a>
+                    <span>{readMinutes(featured.body)} min read</span>
+                  </>
+                </div>
+                <h2 id="featured-heading">
+                  <a href={`/articles/${featured.slug}`}>{featured.title}</a>
+                </h2>
+                <p>{featured.excerpt}</p>
+                <a class="text-link" href={`/articles/${featured.slug}`}>
+                  Get a little curious <Icon name="arrow" />
+                </a>
+                <div class="featured-number" aria-hidden="true">
+                  01 / A DIFFERENT WAY TO SEE
+                </div>
+              </>
+            </div>
+          </>
+        </section>
+      )
+    }
+    <ArticleExplorer
+      client:load
+      initial={result}
+      categories={categories}
+      initialQuery={query}
+      initialSort={sort}
+      initialCategory={category}
+      initialPage={page}
+      initialError={failed}
+    />
+    <section class="series-section">
+      <div>
+        <span class="eyebrow">FOLLOW YOUR CURIOSITY</span><h2>
+          A little more your thing.
+        </h2>
+      </div><div class="series-grid">
+        {
+          categories
+            .filter((c) => c.type === 'secondary')
+            .map((c, i) => (
+              <a href={`/category/${c.slug}`} class="series-card">
+                <>
+                  <span class="series-number">0{i + 1}</span>
+                  <h3>
+                    {c.name} <Icon name="diagonal" size={24} />
+                  </h3>
+                  <p>{c.description}</p>
+                </>
+              </a>
+            ))
+        }
+      </div>
+    </section>
+  </div>
+</Layout>

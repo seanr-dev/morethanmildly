@@ -1,0 +1,8 @@
+node_modules
+.netlify
+.astro
+dist
+package-lock.json
+public/qa-*.html
+public/brand/icon.svg
+netlify/database/migrations

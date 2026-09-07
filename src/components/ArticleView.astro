@@ -1,0 +1,73 @@
+---
+import type { Article } from '../lib/types';
+import { dateLabel, readMinutes } from '../lib/types';
+import ArticleBody from './ArticleBody.astro';
+import ArticleActions from './ArticleActions';
+interface Props {
+  article: Article;
+}
+const { article } = Astro.props;
+---
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="/">Home</a><span aria-hidden="true">/</span>
+  <a href={`/category/${article.primaryCategory?.slug}`}>
+    {article.primaryCategory?.name}
+  </a>
+</nav>
+<article class="full-article">
+  <header class="article-header">
+    <div class="story-meta">
+      <a href={`/category/${article.primaryCategory?.slug}`}>
+        {article.primaryCategory?.name}
+      </a>
+      {
+        article.secondaryCategory && (
+          <a href={`/category/${article.secondaryCategory.slug}`}>
+            {article.secondaryCategory.name}
+          </a>
+        )
+      }
+      <span>{readMinutes(article.body)} min read</span>
+    </div>
+    <h1>{article.title}</h1>
+    <p class="article-deck">{article.excerpt}</p>
+    <div class="byline">
+      <span>By {article.author}</span><span aria-hidden="true">·</span>
+      <time datetime={article.publishedAt || undefined}>
+        {dateLabel(article.publishedAt)}
+      </time>
+    </div>
+  </header>
+  <figure class="article-cover">
+    <img
+      class="editorial-image"
+      src={article.headerImage.url}
+      alt={article.headerImage.alt}
+      width="1600"
+      height="1000"
+      fetchpriority="high"
+      decoding="async"
+    />
+    {
+      article.headerImage.credit && (
+        <figcaption>
+          Photography:{' '}
+          {article.headerImage.source ? (
+            <a
+              href={article.headerImage.source}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              {article.headerImage.credit}
+            </a>
+          ) : (
+            article.headerImage.credit
+          )}
+        </figcaption>
+      )
+    }
+  </figure>
+  <ArticleBody body={article.body} images={article.inlineImages} />
+  <ArticleActions id={article.id} title={article.title} client:load />
+</article>

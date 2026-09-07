@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "More Than Mildly",
+  "short_name": "More Than Mildly",
+  "description": "Fresh perspectives for curious minds.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "en",
+  "categories": ["news", "lifestyle"],
+  "icons": [
+    {
+      "src": "/brand/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/logo-light.png",
+      "sizes": "401x401",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

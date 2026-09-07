@@ -1,0 +1,24 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdminApp from '../../components/admin/AdminApp';
+import Login from '../../components/admin/Login';
+import { getUser } from '@netlify/identity';
+import { siteOrigin } from '../../lib/env';
+const user = await getUser();
+const allowed = user?.roles?.includes('admin');
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+---
+
+<Layout title="Editorial admin" noindex admin
+  >{
+    allowed ? (
+      <AdminApp
+        email={user?.email || ''}
+        publicOrigin={siteOrigin()}
+        client:load
+      />
+    ) : (
+      <Login publicOrigin={siteOrigin()} forbidden={!!user} client:load />
+    )
+  }</Layout
+>

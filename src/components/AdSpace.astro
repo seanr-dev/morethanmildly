@@ -1,0 +1,58 @@
+---
+import type { AdSlot } from '../lib/types';
+import { getAd } from '../lib/repository';
+interface Props {
+  slot: AdSlot;
+}
+const { slot } = Astro.props;
+let ad;
+try {
+  ad = await getAd(slot);
+} catch {
+  ad = null;
+}
+---
+
+<aside
+  class:list={['ad-space', { 'ad-active': !!ad }]}
+  aria-label="Advertisement"
+  data-ad-slot={slot}
+  data-ad-id={ad?.id}
+>
+  <span class="ad-label">ADVERTISEMENT</span>
+  {
+    ad ? (
+      <a
+        href={ad.targetUrl}
+        target="_blank"
+        rel="sponsored noopener noreferrer"
+        class="ad-creative"
+        data-ad-click={ad.id}
+      >
+        {ad.image && (
+          <img
+            src={ad.image.url}
+            alt={ad.image.alt}
+            width="970"
+            height="250"
+            loading="lazy"
+          />
+        )}
+        {!ad.image && (
+          <>
+            <span>{ad.advertiser}</span>
+            <strong>{ad.title}</strong>
+            <span>Discover more ↗</span>
+          </>
+        )}
+      </a>
+    ) : (
+      <a class="ad-invitation" href="/advertise">
+        <>
+          <span>A good place to be seen.</span>
+          <span>Advertise with us ↗</span>
+        </>
+      </a>
+    )
+  }
+</aside>

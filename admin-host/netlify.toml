@@ -1,0 +1,64 @@
+[build]
+  publish = "public"
+
+[[redirects]]
+  from = "/"
+  to = "/admin"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/admin"
+  to = "https://morethanmildly.netlify.app/admin"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/admin/*"
+  to = "https://morethanmildly.netlify.app/admin/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin/*"
+  to = "https://morethanmildly.netlify.app/api/admin/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/.netlify/identity/*"
+  to = "https://morethanmildly.netlify.app/.netlify/identity/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/_astro/*"
+  to = "https://morethanmildly.netlify.app/_astro/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/brand/*"
+  to = "https://morethanmildly.netlify.app/brand/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/media/*"
+  to = "https://morethanmildly.netlify.app/media/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "https://morethanmildly.netlify.app/:splat"
+  status = 302
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "private, no-store"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"

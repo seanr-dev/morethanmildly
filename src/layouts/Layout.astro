@@ -1,0 +1,287 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon';
+import Consent from '../components/Consent';
+import InstallPrompt from '../components/InstallPrompt';
+import { getCategories } from '../lib/repository';
+import type { Category } from '../lib/types';
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+  article?: boolean;
+  structuredData?: Record<string, unknown>;
+  admin?: boolean;
+}
+const {
+  title,
+  description = 'Ideas, discoveries, and fresh perspectives for curious minds. Explore culture, everyday life, the future, and everything that makes you look twice.',
+  image = '/brand/logo-light.png',
+  noindex = false,
+  article = false,
+  structuredData,
+  admin = false,
+} = Astro.props;
+const origin = Astro.site || new URL('https://morethanmildly.netlify.app');
+const canonical = new URL(Astro.url.pathname, origin);
+const page = Astro.url.searchParams.get('page');
+if (page && Number(page) > 1) canonical.searchParams.set('page', page);
+let categories: Category[] = [];
+try {
+  categories = await getCategories();
+} catch {
+  categories = [];
+}
+const fullTitle = title
+  ? `${title} — More Than Mildly`
+  : 'More Than Mildly — For curious minds';
+const serialize = (value: unknown) =>
+  JSON.stringify(value).replace(/</g, '\\u003c');
+---
+
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" /><meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <title>{fullTitle}</title><meta
+      name="description"
+      content={description}
+    /><link rel="canonical" href={canonical} />
+    <meta
+      name="robots"
+      content={noindex ||
+      Astro.url.searchParams.has('q') ||
+      Astro.url.searchParams.has('sort') ||
+      Astro.url.searchParams.has('category')
+        ? 'noindex, follow'
+        : 'index, follow, max-image-preview:large'}
+    />
+    <meta property="og:site_name" content="More Than Mildly" /><meta
+      property="og:type"
+      content={article ? 'article' : 'website'}
+    /><meta property="og:title" content={title || 'More Than Mildly'} /><meta
+      property="og:description"
+      content={description}
+    /><meta property="og:url" content={canonical} /><meta
+      property="og:image"
+      content={new URL(image, origin)}
+    /><meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" /><meta
+      name="twitter:title"
+      content={title || 'More Than Mildly'}
+    /><meta name="twitter:description" content={description} /><meta
+      name="twitter:image"
+      content={new URL(image, origin)}
+    />
+    <link rel="icon" href="/brand/icon.svg" type="image/svg+xml" /><link
+      rel="apple-touch-icon"
+      href="/brand/logo-light.png"
+    />
+    {!admin && <link rel="manifest" href="/manifest.webmanifest" />}<meta
+      name="theme-color"
+      content="#ffffff"
+    /><meta name="color-scheme" content="light dark" />
+    <script is:inline>
+      try {
+        const t =
+          localStorage.getItem('mtm_theme') ||
+          (matchMedia('(prefers-color-scheme:dark)').matches
+            ? 'dark'
+            : 'light');
+        document.documentElement.dataset.theme = t;
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute('content', t === 'dark' ? '#111111' : '#ffffff');
+      } catch {}
+    </script>
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={serialize(
+        structuredData || {
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: 'More Than Mildly',
+          url: origin.toString(),
+          logo: new URL('/brand/logo-light.png', origin).toString(),
+        },
+      )}
+    />
+  </head>
+  <body class:list={{ 'admin-body': admin }}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="header-inner container">
+        <a
+          class="brand"
+          href={admin ? origin.toString() : '/'}
+          aria-label="More Than Mildly home"
+          ><img
+            class="logo-light"
+            src="/brand/logo-dark.png"
+            alt="More Than Mildly"
+            width="82"
+            height="82"
+          /><img
+            class="logo-dark"
+            src="/brand/logo-light.png"
+            alt="More Than Mildly"
+            width="82"
+            height="82"
+          /></a
+        >
+        <nav class="desktop-nav" aria-label="Main navigation">
+          <a
+            href="/#articles"
+            aria-current={Astro.url.pathname === '/' ? 'page' : undefined}
+            >The journal</a
+          ><a
+            href="/about"
+            aria-current={Astro.url.pathname === '/about' ? 'page' : undefined}
+            >About us</a
+          ><a
+            href="/advertise"
+            aria-current={Astro.url.pathname === '/advertise'
+              ? 'page'
+              : undefined}
+            >Advertise with us <Icon name="diagonal" size={14} /></a>
+        </nav>
+        <div class="header-actions">
+          <a
+            class="icon-button"
+            href="/#articles"
+            aria-label="Search the journal"><Icon name="search" /></a
+          ><button
+            class="icon-button theme-toggle"
+            aria-label="Switch color theme"
+            title="Switch color theme"
+            ><span class="show-light"><Icon name="moon" /></span><span
+              class="show-dark"><Icon name="sun" /></span
+            ></button
+          ><button
+            class="icon-button"
+            data-open-install
+            aria-label="Install and notification settings"
+            title="Install and notifications"><Icon name="bell" /></button
+          ><button
+            class="icon-button mobile-menu-toggle"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="mobile-menu"><Icon name="menu" /></button>
+        </div>
+      </div>
+      <nav
+        id="mobile-menu"
+        class="mobile-nav"
+        aria-label="Mobile navigation"
+        hidden
+      >
+        <a href="/#articles">The journal</a><a href="/about">About us</a><a
+          href="/advertise">Advertise with us ↗</a
+        ><span class="eyebrow">CATEGORIES & SERIES</span><div
+          class="mobile-category-links"
+        >
+          {categories.map((c) => <a href={`/category/${c.slug}`}>{c.name}</a>)}
+        </div>
+      </nav>
+    </header>
+    <main id="main"><slot /></main>
+    {
+      !admin && (
+        <>
+          <section class="stay-curious container">
+            <>
+              <div>
+                <>
+                  <span class="eyebrow">A LITTLE MORE IN YOUR DAY</span>
+                  <h2>
+                    Take your curiosity
+                    <br />
+                    with you.
+                  </h2>
+                  <p>
+                    Add More Than Mildly to your home screen. A good read is
+                    always within reach.
+                  </p>
+                </>
+              </div>
+              <button class="button" data-open-install>
+                Make yourself at home <Icon name="diagonal" size={18} />
+              </button>
+            </>
+          </section>
+          <footer class="site-footer">
+            <>
+              <div class="container footer-top">
+                <>
+                  <div class="footer-brand">
+                    <>
+                      <a href="/" class="footer-wordmark">
+                        More than <em>Mildly.</em>
+                      </a>
+                      <p>
+                        For the things that make you
+                        <br />
+                        think, feel, and look twice.
+                      </p>
+                    </>
+                  </div>
+                  <div>
+                    <>
+                      <h2>Explore</h2>
+                      <div class="footer-categories">
+                        {categories
+                          .filter((c) => c.type === 'primary')
+                          .map((c) => (
+                            <a href={`/category/${c.slug}`}>{c.name}</a>
+                          ))}
+                      </div>
+                    </>
+                  </div>
+                  <div>
+                    <h2>A little more</h2>
+                    {categories
+                      .filter((c) => c.type === 'secondary')
+                      .map((c) => (
+                        <a href={`/category/${c.slug}`}>{c.name}</a>
+                      ))}
+                    <a href="/about">About us</a>
+                    <a href="/advertise">Advertise with us ↗</a>
+                  </div>
+                </>
+              </div>
+              <div class="container footer-bottom">
+                <>
+                  <span>© {new Date().getFullYear()} More Than Mildly</span>
+                  <div>
+                    <>
+                      <a href="/privacy">Privacy</a>
+                      <a href="/cookies">Cookies</a>
+                      <button class="text-button" data-open-consent>
+                        Cookie preferences
+                      </button>
+                      <a href="/cookies?optout=1">
+                        Do not sell or share my personal information
+                      </a>
+                    </>
+                  </div>
+                </>
+              </div>
+            </>
+          </footer>
+          <>
+            <Consent client:load />
+            <InstallPrompt client:load />
+          </>
+        </>
+      )
+    }
+    <script>
+      import '../lib/browser';
+    </script>
+  </body>
+</html>

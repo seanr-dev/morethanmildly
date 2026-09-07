@@ -1,0 +1,67 @@
+---
+import type { ContentBlock, InlineImage } from '../lib/types';
+import AdSpace from './AdSpace.astro';
+interface Props {
+  body: ContentBlock[];
+  images: InlineImage[];
+  showAd?: boolean;
+}
+const { body, images, showAd = true } = Astro.props;
+const mid = Math.max(0, Math.ceil(body.length / 2) - 1);
+---
+
+<div class="article-prose">
+  {
+    body.map((block, index) => (
+      <>
+        {block.type === 'paragraph' && <p>{block.text}</p>}
+        {block.type === 'heading' && <h2>{block.text}</h2>}
+        {block.type === 'quote' && (
+          <blockquote>
+            <p>{block.text}</p>
+          </blockquote>
+        )}
+        {block.type === 'list' && (
+          <ul>
+            {block.text
+              .split('\n')
+              .filter(Boolean)
+              .map((line) => (
+                <li>{line}</li>
+              ))}
+          </ul>
+        )}
+        {images
+          .filter((img) => img.afterBlock === index)
+          .map((img) => (
+            <figure>
+              <img
+                class="editorial-image"
+                src={img.url}
+                alt={img.alt}
+                width="1200"
+                height="800"
+                loading="lazy"
+              />
+              {img.credit && (
+                <figcaption>
+                  {img.source ? (
+                    <a
+                      href={img.source}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      {img.credit}
+                    </a>
+                  ) : (
+                    img.credit
+                  )}
+                </figcaption>
+              )}
+            </figure>
+          ))}
+        {showAd && index === mid && <AdSpace slot="article-middle" />}
+      </>
+    ))
+  }
+</div>

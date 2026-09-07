@@ -1,0 +1,108 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ArticleView from '../../components/ArticleView.astro';
+import ArticleCard from '../../components/ArticleCard';
+import AdSpace from '../../components/AdSpace.astro';
+import { getArticle, listArticles } from '../../lib/repository';
+import type { Article } from '../../lib/types';
+let article: Article | null = null;
+let related: Article[] = [];
+let failed = false;
+try {
+  article = await getArticle(Astro.params.slug || '');
+  if (article?.primaryCategory)
+    related = (
+      await listArticles({ category: article.primaryCategory.slug, limit: 4 })
+    ).articles
+      .filter((a) => a.id !== article!.id)
+      .slice(0, 3);
+  if (article && related.length < 3) {
+    const more = (await listArticles({ limit: 8 })).articles.filter(
+      (a) => a.id !== article!.id && !related.some((r) => r.id === a.id),
+    );
+    related = [...related, ...more].slice(0, 3);
+  }
+} catch {
+  failed = true;
+}
+if (!article && !failed) return Astro.rewrite('/404');
+if (failed) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '60');
+}
+const origin = Astro.site || new URL('https://morethanmildly.netlify.app');
+const structuredData = article
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: article.title,
+      description: article.excerpt,
+      image: [new URL(article.headerImage.url, origin).toString()],
+      datePublished: article.publishedAt,
+      dateModified: article.updatedAt,
+      author: {
+        '@type':
+          article.author === 'More Than Mildly' ? 'Organization' : 'Person',
+        name: article.author,
+        url: new URL('/about', origin).toString(),
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'More Than Mildly',
+        logo: {
+          '@type': 'ImageObject',
+          url: new URL('/brand/logo-light.png', origin).toString(),
+        },
+      },
+      mainEntityOfPage: new URL(`/articles/${article.slug}`, origin).toString(),
+      articleSection: article.primaryCategory?.name,
+      inLanguage: 'en',
+      isAccessibleForFree: true,
+      articleBody: article.body.map((b) => b.text).join('\n\n'),
+    }
+  : undefined;
+---
+
+<Layout
+  title={article?.title || 'Article temporarily unavailable'}
+  description={article?.excerpt}
+  image={article?.headerImage.url}
+  article
+  structuredData={structuredData}
+>
+  <div class="container">
+    <AdSpace slot="article-top" />{
+      article ? (
+        <>
+          <ArticleView article={article} />
+          <AdSpace slot="article-bottom" />
+          {related.length > 0 && (
+            <section class="related-section">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">KEEP THE CURIOSITY GOING</span>
+                  <h2>A little further down the rabbit hole.</h2>
+                </div>
+              </div>
+              <div class="article-grid">
+                {related.map((a) => (
+                  <ArticleCard article={a} />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      ) : (
+        <div class="empty-state" role="alert">
+          <>
+            <h1>A brief pause.</h1>
+            <p>We couldn’t load this article. Please try again in a moment.</p>
+            <a class="button" href={Astro.url.pathname}>
+              Try again
+            </a>
+          </>
+        </div>
+      )
+    }
+  </div>
+</Layout>

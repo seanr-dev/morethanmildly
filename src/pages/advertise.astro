@@ -1,0 +1,61 @@
+---
+import Layout from '../layouts/Layout.astro';
+import EnquiryForm from '../components/EnquiryForm';
+import Icon from '../components/Icon';
+---
+
+<Layout
+  title="Advertise with us"
+  description="Put your brand alongside content that invites a closer look. Enquire about category and article advertising on More Than Mildly."
+  ><div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a><span>/</span><span>Advertise</span>
+    </div><section class="advertise-hero">
+      <span class="eyebrow">GOOD CONTENT. GOOD COMPANY.</span><h1>
+        A good place<br />to <em>be seen.</em>
+      </h1><p>
+        Bring your brand into the conversation.<br />Thoughtful placements,
+        alongside stories worth spending time with.
+      </p><a href="#enquire" class="button"
+        >Explore a partnership <Icon name="diagonal" size={18} /></a>
+    </section><section class="placements-section">
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">MAKE ROOM FOR YOUR BRAND</span><h2>
+            The right place for your story.
+          </h2>
+        </div>
+      </div><div class="placement-grid">
+        <article>
+          <span class="placement-number">01</span><h3>Category placement</h3><p>
+            A prominent position above the stories, where readers are exploring
+            their interests.
+          </p><span class="eyebrow">AT THE TOP OF CATEGORY PAGES</span>
+        </article><article>
+          <span class="placement-number">02</span><h3>Article placement</h3><p>
+            Meet readers in the flow of an article, with space at the beginning,
+            middle, or end.
+          </p><span class="eyebrow">THREE POSITIONS TO CONSIDER</span>
+        </article><article>
+          <span class="placement-number">03</span><h3>
+            A considered campaign
+          </h3><p>
+            Tell us about your brand and goals. We’ll discuss the available
+            placements, creative, and timing.
+          </p><span class="eyebrow">BUILT AROUND A CONVERSATION</span>
+        </article>
+      </div>
+    </section><section id="enquire" class="enquiry-section">
+      <div>
+        <span class="eyebrow">LET’S TALK</span><h2>
+          More than<br />a first impression.
+        </h2><p>
+          Tell us what you have in mind. We’ll discuss availability and provide
+          a proposal for your campaign.
+        </p><p class="muted">
+          No automated purchase or payment is required to enquire.
+        </p>
+      </div><EnquiryForm client:load />
+    </section>
+  </div></Layout
+>

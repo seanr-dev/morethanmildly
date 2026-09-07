@@ -1,0 +1,87 @@
+---
+import Layout from '../layouts/Layout.astro';
+import EnquiryForm from '../components/EnquiryForm';
+---
+
+<Layout
+  title="Privacy"
+  description="How More Than Mildly handles your information, preferences, enquiries, and privacy requests."
+  ><div class="container legal-page">
+    <span class="eyebrow">YOUR PRIVACY</span><h1>A little clarity.</h1><p
+      class="legal-date"
+    >
+      Privacy policy · Last updated 6 September 2026
+    </p><div class="prose">
+      <p>
+        This notice describes how More Than Mildly handles information through
+        this publication. Use the form below to contact the team about privacy
+        or your personal information.
+      </p><h2>Information you give us</h2><p>
+        If you send an enquiry, we store your name, email address, optional
+        company name, and message so the team can respond. Please do not include
+        sensitive personal information. Administrators have authenticated
+        accounts managed through Netlify Identity.
+      </p><h2>Information used to operate the site</h2><p>
+        Likes use a signed browser identifier. We store a hash of that
+        identifier with the article you liked. The total helps order articles,
+        and is not displayed publicly. Notification subscriptions contain a
+        browser push endpoint, encryption keys, and your time zone, allowing us
+        to deliver the notifications you request.
+      </p><p>
+        The hosting provider processes technical information, including network
+        addresses, for delivery and security. Our request limits use a
+        short-lived hash to limit abuse. The application does not put your name,
+        email, or search terms into analytics events.
+      </p><h2>Optional measurement</h2><p>
+        If you accept analytics and the integration is configured, Google
+        Analytics can receive reading and interaction events. Meta and TikTok
+        integrations remain disabled unless the publication enables them and you
+        separately consent. We respect Global Privacy Control for advertising
+        tracking. Read our <a href="/cookies">cookie policy</a> to manage choices.
+      </p><h2>Why information is used</h2><p>
+        We use information to deliver requested features, answer enquiries,
+        maintain security, and, with consent, measure use of the publication.
+        Depending on the applicable law and activity, processing may rely on
+        consent, steps requested before a contract, or legitimate interests in
+        operating and securing the service.
+      </p><h2>Service providers and international processing</h2><p>
+        Netlify provides hosting, database, image storage, and admin
+        authentication. Browser push services deliver notifications. When
+        enabled with consent, Google, Meta, and TikTok provide measurement
+        services. These providers may process information in countries other
+        than yours. Provider agreements and any required transfer safeguards
+        must be considered for the services in use.
+      </p><h2>Retention</h2><p>
+        Notification delivery records are retained for up to 30 days.
+        Notification subscriptions are removed when you unsubscribe or the push
+        service reports an expired subscription. Enquiries stay available to the
+        team until deleted. Like records remain until removed by the reader,
+        removed through a privacy request, or the article is deleted. Hosting
+        and measurement providers maintain their own configured retention
+        periods.
+      </p><h2>Your choices and rights</h2><p>
+        Depending on your location, you may have rights to access, correct,
+        delete, or receive a copy of personal information; object to or restrict
+        certain uses; withdraw consent; or complain to a relevant privacy
+        authority. California residents may also have rights to opt out of
+        selling or sharing personal information and to exercise applicable
+        rights without discrimination.
+      </p><p>
+        You can withdraw cookie consent in the footer, turn notifications off
+        using the bell in the header, and submit a privacy request below. The
+        team may need limited information to verify a request for personal data,
+        but you do not need an account to opt out of advertising tracking.
+      </p><h2>Children and young people</h2><p>
+        This publication is available to a broad audience. We do not ask readers
+        to provide a date of birth. Advertising pixels are disabled by default.
+        If you believe a child has sent personal information that should be
+        removed, contact us below.
+      </p>
+    </div><section id="request" class="privacy-request">
+      <h2>Contact the privacy team</h2><p>
+        Ask a question or request access, correction, or deletion of personal
+        information.
+      </p><EnquiryForm client:load kind="privacy" />
+    </section>
+  </div></Layout
+>

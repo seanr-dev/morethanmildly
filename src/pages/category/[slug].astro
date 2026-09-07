@@ -1,0 +1,76 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ArticleExplorer from '../../components/ArticleExplorer';
+import AdSpace from '../../components/AdSpace.astro';
+import { getCategories, listArticles } from '../../lib/repository';
+import type { Category, ArticlePage } from '../../lib/types';
+let categories: Category[] = [];
+let result: ArticlePage = { articles: [], nextPage: null, total: 0 };
+let failed = false;
+const query = Astro.url.searchParams.get('q') || '';
+const sort =
+  Astro.url.searchParams.get('sort') === 'liked' ? 'liked' : 'newest';
+const page = Number(Astro.url.searchParams.get('page')) || 1;
+try {
+  categories = await getCategories();
+} catch {
+  failed = true;
+}
+const category = categories.find((c) => c.slug === Astro.params.slug);
+if (!failed && !category) return Astro.rewrite('/404');
+try {
+  if (category)
+    result = await listArticles({
+      q: query,
+      sort,
+      category: category.slug,
+      page,
+    });
+} catch {
+  failed = true;
+}
+if (failed) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '60');
+}
+---
+
+<Layout title={category?.name || 'Stories'} description={category?.description}>
+  <div class="container">
+    <AdSpace slot="category-top" /><div class="breadcrumb">
+      <a href="/">Home</a><span>/</span><span
+        >{category?.name || 'Stories'}</span>
+    </div><header class="category-header">
+      <span class="eyebrow"
+        >{
+          category?.type === 'secondary'
+            ? 'A MORE THAN MILDLY SERIES'
+            : 'FOLLOW YOUR CURIOSITY'
+        }</span
+      ><h1>
+        {category?.name || 'Stories'}<span class="title-period">.</span>
+      </h1><p>{category?.description}</p>
+    </header><nav class="category-nav" aria-label="Browse categories">
+      <a href="/#articles">All stories</a>{
+        categories.map((c) => (
+          <a
+            href={`/category/${c.slug}`}
+            aria-current={c.id === category?.id ? 'page' : undefined}
+            class={c.id === category?.id ? 'active' : ''}
+          >
+            {c.name}
+          </a>
+        ))
+      }
+    </nav><ArticleExplorer
+      client:load
+      initial={result}
+      categories={categories}
+      fixedCategory={category?.slug}
+      initialQuery={query}
+      initialSort={sort}
+      initialPage={page}
+      initialError={failed}
+    />
+  </div>
+</Layout>
