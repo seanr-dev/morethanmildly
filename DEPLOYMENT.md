@@ -8,13 +8,28 @@ The admin address is served by `morethanmildly-admin` (project ID `d9a31e90-d937
 
 A custom domain can later replace the Netlify addresses. Update `PUBLIC_SITE_URL`, `PUBLIC_ADMIN_ORIGIN`, both redirect configurations, Identity URLs and the VAPID subject, then redeploy. The admin and publication should retain separate origins.
 
-For future Git-driven builds, connect each existing Netlify project to `seanr-dev/morethanmildly` in **Project configuration → Build & deploy → Continuous deployment**, using `main` and the directories above. This initial source deployment does not by itself establish continuous deployment.
+Connect each existing Netlify project to `seanr-dev/morethanmildly` in **Project configuration → Build & deploy → Continuous deployment**, with automatic builds active and `main` as the production branch. Keep the existing projects so their URLs, environment variables and production database are retained.
+
+| Setting            | Publication                   | Admin host                 |
+| ------------------ | ----------------------------- | -------------------------- |
+| Project            | `morethanmildly`              | `morethanmildly-admin`     |
+| Repository         | `seanr-dev/morethanmildly`    | `seanr-dev/morethanmildly` |
+| Production branch  | `main`                        | `main`                     |
+| Base directory     | Repository root (leave blank) | `admin-host`               |
+| Package directory  | Leave blank                   | `admin-host`               |
+| Build command      | `npm run build`               | Leave blank                |
+| Publish directory  | `dist`                        | `public`                   |
+| Configuration file | `netlify.toml`                | `admin-host/netlify.toml`  |
+
+The admin package directory makes Netlify select its proxy configuration; the admin base directory makes `public` resolve to `admin-host/public`. Check the resolved configuration path in the first Git build log. See [Netlify's build configuration documentation](https://docs.netlify.com/build/configure-builds/overview/) for directory settings.
+
+After connecting, verify that both deploy records reference the repository's actual `main` commit SHA and reach `ready`. A subsequent commit must trigger deployment automatically before continuous deployment is considered verified. Source-upload deployments do not establish this connection.
 
 ## GitHub sync status
 
-The requested repository is `seanr-dev/morethanmildly`. The initial push was blocked: the GitHub connector returned HTTP 403, `Resource not accessible by integration`, and the command-line environment has no GitHub credentials. The local source has committed Git history. Netlify deployments succeeded independently; GitHub continuous deployment is not yet connected.
+GitHub write access was restored on 7 September 2026. The complete 85-file application was published to `main` in commit `e51e9a822a7256d20d7c994705ffa254bd683339`. Its Git tree, `16b53e5d22a5d72cb16b470385fc4c8479b40065`, exactly matches the verified release source. The original local development history is preserved on `local/pre-github-sync`; the working `main` branch tracks GitHub.
 
-Grant the connected GitHub app write access to this repository and reconnect if required. The prepared local branch can then be pushed with `git push -u origin main`. Do not paste access tokens into a chat or source file. If working from the downloadable ZIP, extract it and initialize your own checkout of the empty target repository using your normal GitHub authentication.
+Netlify continuous deployment still needs the repository connection. The connected Netlify tool supports source deployments but does not expose repository linking, and the local Netlify CLI is signed out. The CLI supports a secure authorization request with `netlify login --request "Connect the existing More Than Mildly projects to GitHub"`; the account owner approves the returned Netlify URL, after which `netlify login --check <ticket-id>` completes login. No access token needs to be shared in chat or committed to source. Repository access for the Netlify GitHub App may also need approval during linking.
 
 ## Activate the first administrator
 
