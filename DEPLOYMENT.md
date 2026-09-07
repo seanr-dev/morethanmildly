@@ -23,7 +23,9 @@ Both existing Netlify projects are connected to `seanr-dev/morethanmildly` throu
 
 The admin base directory makes Netlify select `admin-host/netlify.toml` and resolve `public` to `admin-host/public`. A separate package directory is unnecessary because the configuration lives in the base directory. Both paths were checked with Netlify's configuration resolver. See [Netlify's build configuration documentation](https://docs.netlify.com/build/configure-builds/overview/) for directory settings.
 
-To verify continuous deployment, check that a new GitHub commit triggers both projects and that each deploy record references that commit SHA and reaches `ready`. Changes confined to the publication do not need to rebuild the static admin proxy. Source-upload deployments do not establish or verify the GitHub connection. Deployment evidence is recorded in [VERIFICATION.md](VERIFICATION.md).
+Continuous deployment was verified with commit `c67f4e68db9391f7cffec578eb64bf3e8b875d9e`: GitHub triggered production builds for both projects, and both reached `ready` with that exact commit SHA. Changes confined to the publication do not need to rebuild the static admin proxy. Deployment evidence is recorded in [VERIFICATION.md](VERIFICATION.md).
+
+The publication's production URL is public. Netlify team-login protection is limited to its non-production deploys, so previews remain protected while readers and crawlers can access the published site. Editorial API authentication remains enforced by the application.
 
 ## GitHub sync status
 

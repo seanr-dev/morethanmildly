@@ -33,10 +33,23 @@ Checks performed on the implementation and local database during the initial rel
 
 The Netlify publication and admin-subdomain deployments reached `ready`. All three initial migrations were applied to the production database. The publication home and paginated article API returned HTTP 200 with 16 launch stories; the admin subdomain returned HTTP 200 with the signed-out login. The manifest is served as `application/manifest+json`. Unauthenticated admin API access returns 401. Identity's settings endpoint returned 404, confirming that Identity activation remains an owner setup step.
 
-GitHub access was restored on 7 September 2026. All 85 application files were published on `seanr-dev/morethanmildly:main` in commit `e51e9a822a7256d20d7c994705ffa254bd683339`. The remote Git tree matches the local release exactly (`16b53e5d22a5d72cb16b470385fc4c8479b40065`), including binary assets and the dependency lockfile. A fresh Git fetch confirmed the match. After the owner approved Netlify CLI authorization, both existing projects were connected to that repository on `main`, with `stop_builds: false` and the account's Netlify GitHub App installation. A new documentation commit is being used to verify the automatic deployment event; the previous source-upload release is recorded below.
+GitHub access was restored on 7 September 2026. All 85 application files were published on `seanr-dev/morethanmildly:main` in commit `e51e9a822a7256d20d7c994705ffa254bd683339`. The remote Git tree matches the local release exactly (`16b53e5d22a5d72cb16b470385fc4c8479b40065`), including binary assets and the dependency lockfile. A fresh Git fetch confirmed the match. After the owner approved Netlify CLI authorization, both existing projects were connected to that repository on `main`, with `stop_builds: false` and the account's Netlify GitHub App installation.
 
 Netlify's configuration resolver selected `netlify.toml` with `npm run build` / `dist` for the publication and `admin-host/netlify.toml` with no build command / `admin-host/public` for the admin host. It also reported a reserved-path warning for the admin Identity rewrite. Separate-host authentication remains unverified and requires a routing fix as well as Identity activation.
 
 The final release audit checked all 32 sitemap URLs successfully: HTTP 200, one page heading, matching canonical URL, Open Graph metadata and valid structured data. Every article contained its reading body and the top/middle/bottom ad positions in order; every category had its header advertisement. Production API queries verified text search, empty results, primary/secondary filters and pagination, with no like totals exposed. Missing page/category/article URLs returned 404. The service worker, offline page and public push-key endpoint returned 200.
 
-Final publication deploy: `6a9eb8ca57f6a9d36eba7e8f`. Admin-host deploy: `6a9eb697559c85b128d25cd9`.
+Initial source-upload publication deploy: `6a9eb8ca57f6a9d36eba7e8f`. Initial admin-host deploy: `6a9eb697559c85b128d25cd9`.
+
+## Verified GitHub continuous deployment
+
+Updating GitHub `main` to commit `c67f4e68db9391f7cffec578eb64bf3e8b875d9e` automatically triggered both production deployments on 7 September 2026. No source upload, manual build trigger or local deploy command was used for this verification.
+
+| Project     | Deployment                 | Git commit                                 | Result                      |
+| ----------- | -------------------------- | ------------------------------------------ | --------------------------- |
+| Publication | `6a9f096116a909000989f016` | `c67f4e68db9391f7cffec578eb64bf3e8b875d9e` | `ready`, production, `main` |
+| Admin host  | `6a9f096175770100082637f8` | `c67f4e68db9391f7cffec578eb64bf3e8b875d9e` | `ready`, production, `main` |
+
+The publication deployed its three functions and retained the notification schedule. Netlify reported no pending database migrations. The admin build deployed its static proxy configuration with no functions; its Identity rewrite warning remains the authentication limitation described above.
+
+A live check found that production was behind Netlify team login. Protection was narrowed to non-production deploys for the publication only, retaining protected previews and making production public. This is separate from the application's required admin authentication.

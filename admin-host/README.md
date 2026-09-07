@@ -6,6 +6,8 @@ The project is connected to `seanr-dev/morethanmildly` on `main`, using `admin-h
 
 Changes under this directory should trigger an automatic deployment of the admin host. Publication code changes deploy on the primary project; the proxy serves its updated admin pages and assets.
 
+This GitHub trigger was verified on 7 September 2026: commit `c67f4e68db9391f7cffec578eb64bf3e8b875d9e` produced the successful production deployment `6a9f096175770100082637f8` automatically.
+
 The primary project owns the database and uploaded media. Every editorial API request requires authentication and the administrator role. The separate host's Identity proxy currently produces a reserved-path warning and needs resolution before authenticated login can be verified. Do not treat the signed-out login page as proof that authenticated operations work.
 
 See [deployment instructions](../DEPLOYMENT.md) and [verification records](../VERIFICATION.md) for current setup requirements and release evidence.
