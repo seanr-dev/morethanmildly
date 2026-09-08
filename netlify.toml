@@ -13,7 +13,7 @@
 
 [dev]
   command = "npm run dev"
-  targetPort = 4173
+  targetPort = 4321
   port = 8888
   framework = "astro"
 

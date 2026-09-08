@@ -143,12 +143,13 @@ const serialize = (value: unknown) =>
             href="/about"
             aria-current={Astro.url.pathname === '/about' ? 'page' : undefined}
             >About us</a
-          ><a
+          >
+          <!-- <a
             href="/advertise"
             aria-current={Astro.url.pathname === '/advertise'
               ? 'page'
               : undefined}
-            >Advertise with us <Icon name="diagonal" size={14} /></a>
+            >Advertise with us <Icon name="diagonal" size={14} /></a> -->
         </nav>
         <div class="header-actions">
           <a
@@ -250,7 +251,7 @@ const serialize = (value: unknown) =>
                         <a href={`/category/${c.slug}`}>{c.name}</a>
                       ))}
                     <a href="/about">About us</a>
-                    <a href="/advertise">Advertise with us ↗</a>
+                    {/* <a href="/advertise">Advertise with us ↗</a> */}
                   </div>
                 </>
               </div>
