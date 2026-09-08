@@ -4,11 +4,11 @@
 
 The primary application is `morethanmildly` (project ID `6766cc96-9750-4b60-8917-76b7d391c170`). Build from the repository root with `npm run build`, publish `dist`, Node 22. Netlify runs the SQL migrations in `netlify/database/migrations` and injects database connectivity for `@netlify/database`. Drizzle uses its native Netlify Database adapter. `src/db/client.ts` bridges the pinned Drizzle release candidate’s string-call API to Neon 1.x `.query()`, preserving parameterization and the SDK’s refreshing credentials. A regression test exercises this cloud path.
 
-The admin address is served by `morethanmildly-admin` (project ID `d9a31e90-d937-4622-b34f-006be7aabaa3`). Its base directory is `admin-host`, publish directory `public`, with no build command. It proxies admin, Identity, assets and media requests to the primary application. Both addresses use the primary database and Identity service. Every admin API request independently verifies authentication and the `admin` role. The upstream `/admin` route also remains protected and available to avoid a proxy redirect loop.
+The admin address is served by `morethanmildly-admin` (project ID `d9a31e90-d937-4622-b34f-006be7aabaa3`). Its base directory is `admin-host`, publish directory `public`, with no build command. It proxies admin pages, API requests, assets and media to the primary application. Both addresses are intended to use the primary database and Identity service. Every admin API request independently verifies authentication and the `admin` role. The upstream `/admin` route also remains protected and available to avoid a proxy redirect loop. The separate host's Identity routing still needs resolution and verification; see the administrator activation notes below.
 
 A custom domain can later replace the Netlify addresses. Update `PUBLIC_SITE_URL`, `PUBLIC_ADMIN_ORIGIN`, both redirect configurations, Identity URLs and the VAPID subject, then redeploy. The admin and publication should retain separate origins.
 
-Connect each existing Netlify project to `seanr-dev/morethanmildly` in **Project configuration → Build & deploy → Continuous deployment**, with automatic builds active and `main` as the production branch. Keep the existing projects so their URLs, environment variables and production database are retained.
+Both existing Netlify projects are connected to `seanr-dev/morethanmildly` through the account's Netlify GitHub App, with automatic builds active and `main` as the production branch. The repository connection preserves the existing projects, URLs, environment variables and production database. Inspect these settings in **Project configuration → Build & deploy → Continuous deployment**.
 
 | Setting            | Publication                   | Admin host                 |
 | ------------------ | ----------------------------- | -------------------------- |
@@ -16,20 +16,22 @@ Connect each existing Netlify project to `seanr-dev/morethanmildly` in **Project
 | Repository         | `seanr-dev/morethanmildly`    | `seanr-dev/morethanmildly` |
 | Production branch  | `main`                        | `main`                     |
 | Base directory     | Repository root (leave blank) | `admin-host`               |
-| Package directory  | Leave blank                   | `admin-host`               |
+| Package directory  | Leave blank                   | Leave blank                |
 | Build command      | `npm run build`               | Leave blank                |
 | Publish directory  | `dist`                        | `public`                   |
 | Configuration file | `netlify.toml`                | `admin-host/netlify.toml`  |
 
-The admin package directory makes Netlify select its proxy configuration; the admin base directory makes `public` resolve to `admin-host/public`. Check the resolved configuration path in the first Git build log. See [Netlify's build configuration documentation](https://docs.netlify.com/build/configure-builds/overview/) for directory settings.
+The admin base directory makes Netlify select `admin-host/netlify.toml` and resolve `public` to `admin-host/public`. A separate package directory is unnecessary because the configuration lives in the base directory. Both paths were checked with Netlify's configuration resolver. See [Netlify's build configuration documentation](https://docs.netlify.com/build/configure-builds/overview/) for directory settings.
 
-After connecting, verify that both deploy records reference the repository's actual `main` commit SHA and reach `ready`. A subsequent commit must trigger deployment automatically before continuous deployment is considered verified. Source-upload deployments do not establish this connection.
+Continuous deployment was verified with commit `c67f4e68db9391f7cffec578eb64bf3e8b875d9e`: GitHub triggered production builds for both projects, and both reached `ready` with that exact commit SHA. Changes confined to the publication do not need to rebuild the static admin proxy. Deployment evidence is recorded in [VERIFICATION.md](VERIFICATION.md).
+
+The publication's production URL is public. Netlify team-login protection is limited to its non-production deploys, so previews remain protected while readers and crawlers can access the published site. Editorial API authentication remains enforced by the application.
 
 ## GitHub sync status
 
 GitHub write access was restored on 7 September 2026. The complete 85-file application was published to `main` in commit `e51e9a822a7256d20d7c994705ffa254bd683339`. Its Git tree, `16b53e5d22a5d72cb16b470385fc4c8479b40065`, exactly matches the verified release source. The original local development history is preserved on `local/pre-github-sync`; the working `main` branch tracks GitHub.
 
-Netlify continuous deployment still needs the repository connection. The connected Netlify tool supports source deployments but does not expose repository linking, and the local Netlify CLI is signed out. The CLI supports a secure authorization request with `netlify login --request "Connect the existing More Than Mildly projects to GitHub"`; the account owner approves the returned Netlify URL, after which `netlify login --check <ticket-id>` completes login. No access token needs to be shared in chat or committed to source. Repository access for the Netlify GitHub App may also need approval during linking.
+Netlify CLI authorization was approved on 7 September 2026, and both existing projects were linked to this repository on `main`. Netlify confirmed the repository URL, GitHub provider, production branch and active automatic builds for each project. Authorization is stored in the CLI's standard credential store; no access token is included in source.
 
 ## Activate the first administrator
 
@@ -41,6 +43,8 @@ Netlify continuous deployment still needs the repository connection. The connect
 6. Create a draft, upload an image, publish, edit and delete a temporary article to verify the account and Blobs permissions.
 
 No credentials or administrator account have been invented. Identity activation and a real administrator email are necessary for the first authenticated end-to-end session. Documentation: [Netlify Identity setup](https://docs.netlify.com/manage/security/secure-access-to-sites/identity/get-started/).
+
+The configuration resolver reports that the admin host's `/.netlify/identity/*` proxy rule uses a reserved source path. This routing issue must be resolved before treating separate-host login as ready; enabling Identity alone does not verify it. The protected primary `/admin` address is available for primary-origin authentication checks.
 
 ## Environment variables
 
